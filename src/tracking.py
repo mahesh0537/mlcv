@@ -51,6 +51,7 @@ def tracker_yolo(camera):
     xyz = [0,0,0]
     angle = 0
     sense = 0
+    sense0 = 0
     print('CV loaded to be used')
     while True:
         camera.click_depth_image()
@@ -75,20 +76,27 @@ def tracker_yolo(camera):
                 ky = 2
 
             yolo_out = cv2.rectangle(yolo_out, (c_patch[0]-kx, c_patch[1]-ky), (c_patch[0]+kx +1, c_patch[1]+ky+1), (0,255, 0), 3)
-            pc, pc_sense = plane.point_cloud(center, np.array(c_patch), depth, Fx, Fy, kx = kx, ky = ky)
+            pc, pc_sense, points = plane.point_cloud(center, np.array(c_patch), depth, Fx, Fy, kx = kx, ky = ky)
+            
             t = True
             avg_z = np.sum(pc.T[2])/pc.T[2].shape[0]
             x_center = (center[0] - bgr.shape[1]/2)*avg_z/Fx
             y_center = (center[1] - bgr.shape[0]/2)*avg_z/Fy
             xyz = [x_center, y_center, avg_z]
             try:
-                sense = line.best_line(pc_sense)
-                sense = -1*sense[1]/sense[0]
-                m = plane.face_vector(pc)
-                a ,b, c, d = m
-                angle = trans.angle_with_z([a, b ,c])
+                sense, best_fit_found = line.best_line(pc_sense)
+                if best_fit_found:
+                    sense = -1*sense[1]/sense[0]
+                else:
+                    sense = sense0
+
+                m, best_fit_found = plane.face_vector(pc)
+                if best_fit_found:
+                    a ,b, c, d = m
+                    angle = trans.angle_with_z([a, b ,c])
                 #print(angle)
                 #print(sense)
+                sense0 = sense
                 TO.pub(1, xyz, angle, sense)
             except:
                 print('Error in plane finding')
@@ -98,14 +106,17 @@ def tracker_yolo(camera):
 
             
 
-            cv2.imshow('YOLO output', yolo_out)
+            #cv2.imshow('YOLO output', yolo_out)
             rate.sleep()
             
         else:
-            cv2.imshow('YOLO output', bgr)
-        if cv2.waitKey(25) & 0xFF == ord('q'):
-            break
-    cv2.destroyAllWindows()
+            TO.pub(0, xyz, angle, sense)
+            print('nothing detected')
+            rate.sleep()
+            #cv2.imshow('YOLO output', bgr)
+        #if cv2.waitKey(25) & 0xFF == ord('q'):
+        #   break
+    #cv2.destroyAllWindows()
         
 
 

@@ -22,13 +22,13 @@ def invert_input(func):
         return roll, pitch, yaw
     return decorater
 
-@invert_input
+#@invert_input
 def quad_eular(x, y, z, w):  
     r = R.from_quat([x ,y,z ,w])
     curr_roll ,curr_pitch ,curr_yaw=r.as_euler('xyz', degrees=True)
     return curr_roll, curr_pitch, curr_yaw
 
-@invert_output
+#@invert_output
 def eular_quad(roll, pitch, yaw):
     r = R.from_euler('xyz', [roll, pitch, math.radians(yaw)])
     x,y,z,w = r.as_quat()

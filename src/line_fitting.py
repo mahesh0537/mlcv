@@ -23,8 +23,8 @@ def is_inlier(coeffs, xy, threshold):
 def best_line(points):
     max_iterations = 500
     goal_inliers = 21*4 * 0.3
-    m, b = run_ransac(points, estimate, lambda x, y: is_inlier(x, y, 0.01), 2, goal_inliers, max_iterations)
-    return m
+    m, b, best_fit_found = run_ransac(points, estimate, lambda x, y: is_inlier(x, y, 0.01), 2, goal_inliers, max_iterations)
+    return m, best_fit_found
 
 
 if __name__ == '__main__':

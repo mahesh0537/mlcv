@@ -2,7 +2,7 @@
 import rospy
 import numpy as np
 class PID:
-    def __init__(self, Kp=2, Ki=0.0, Kd=1.5, maxI=10, maxOut=5, frequency = 20):
+    def __init__(self, Kp=2, Ki=0.0, Kd=3, maxI=10, maxOut=2, frequency = 20):
         self.Kp = Kp
         self.Ki = Ki
         self.Kd = Kd
@@ -47,3 +47,5 @@ class PID:
         self.intError = 0.0
         self.lastError = 0.0
         self.output = 0.0
+    
+    # def plot(self):

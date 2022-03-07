@@ -66,8 +66,8 @@ def point_cloud(center, center_patch, depth,  Fx, Fy, kx = 10, ky = 5, sitl = Tr
 def face_vector(pc):
     goal_inliers = pc.shape[0]*0.6
     max_iterations = 10090000
-    m, best_inliers = run_ransac(pc, estimate, lambda x, y: is_inlier(x, y, 0.01), 3, goal_inliers, max_iterations)
-    return m
+    m, best_inliers, best_fit_found = run_ransac(pc, estimate, lambda x, y: is_inlier(x, y, 0.01), 3, goal_inliers, max_iterations)
+    return m, best_fit_found
 
 
 
