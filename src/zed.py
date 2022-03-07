@@ -45,7 +45,7 @@ class ZED_output:
         #DEPTH
         self.get_depth_image = rospy.Subscriber('/zed2/zed_node/depth/depth_registered', numpy_msg(Image), self.get_depth)
         #intrinsic parameters
-        #self.depth_camera_info = rospy.Subscriber('/r200/rgb/camera_info', CameraInfo, self.get_info)
+        self.depth_camera_info = rospy.Subscriber('/r200/rgb/camera_info', CameraInfo, self.get_info)
 
     def get_depth(self, depth_data):
         # self.img_depth = np.frombuffer(depth_data.data, dtype=np.float32).reshape(depth_data.height, depth_data.width, -1)
