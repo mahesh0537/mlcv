@@ -3,7 +3,8 @@ import rospy
 import numpy as np
 from sensor_msgs.msg import  Image, CameraInfo
 from time import sleep
-import ros_numpy
+import time
+
 from rospy.numpy_msg import numpy_msg
 
 
@@ -32,6 +33,7 @@ class ZED_output:
         self.count_bgr_r = 0
         self.count_bgr_l = 0
         self.count_depth = 0
+        self.t0 = time.time()
 
 
         #NODE
@@ -39,15 +41,14 @@ class ZED_output:
 
         #SUBSCRIBER
         #RGBA
-        self.get_rgb_image_right = rospy.Subscriber('/zed2/zed_node/right/image_rect_color', Image, self.get_rgb_right)
-        self.get_rgb_image_left = rospy.Subscriber('/zed2/zed_node/right/image_rect_color', Image, self.get_rgb_left)
-        self.get_rgb_image = rospy.Subscriber('/zed2/zed_node/rgb/image_rect_color', Image, self.get_rgb)
+        self.get_rgb_image_left = rospy.Subscriber('/zed2/zed_node/left/image_rect_color', Image, self.get_rgb_left)
         #DEPTH
         self.get_depth_image = rospy.Subscriber('/zed2/zed_node/depth/depth_registered', numpy_msg(Image), self.get_depth)
         #intrinsic parameters
         self.depth_camera_info = rospy.Subscriber('/r200/rgb/camera_info', CameraInfo, self.get_info)
 
     def get_depth(self, depth_data):
+        t0 = time.time()
         # self.img_depth = np.frombuffer(depth_data.data, dtype=np.float32).reshape(depth_data.height, depth_data.width, -1)
         img_depth = np.frombuffer(depth_data.data, dtype=np.float32).reshape(depth_data.height, depth_data.width, -1)
         img = np.array(img_depth).copy()
@@ -59,20 +60,9 @@ class ZED_output:
         #np.save('zed_data/d'+str(self.count_depth), self.img_depth)
         #self.count_depth += 1
         #self.img_depth = ros_numpy.numpify(depth_data)
+        print('frame grab '+str(1/(t0 - self.t0)))
+        self.t0 = t0
 
-    def get_rgb(self, rgb_data):
-        self.img_rgb = np.frombuffer(rgb_data.data, dtype=np.uint8).reshape(rgb_data.height, rgb_data.width, -1)[:,:,0:3]
-        self.img_bgr = self.img_rgb[...,::-1]
-
-        #cv2.imwrite('zed_data/z'+str(self.count_bgr)+ '.jpeg', self.img_bgr)
-        #self.count_bgr += 1
-
-    def get_rgb_right(self, rgb_data):
-        self.img_rgb_right = np.frombuffer(rgb_data.data, dtype=np.uint8).reshape(rgb_data.height, rgb_data.width, -1)[:,:,0:3]
-        self.img_bgr_right = self.img_rgb_right[...,::-1]
-
-        #cv2.imwrite('zed_data/zr'+str(self.count_bgr_r)+ '.jpeg', self.img_bgr_right)
-        #self.count_bgr_r += 1
 
     def get_rgb_left(self, rgb_data):
         self.img_rgb_left = np.frombuffer(rgb_data.data, dtype=np.uint8).reshape(rgb_data.height, rgb_data.width, -1)[:,:,0:3]
