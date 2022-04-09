@@ -6,3 +6,8 @@
 *.npy
 *.jpeg
 *.png
+src/Untitled3.ipynb
+src/Untitled4.ipynb
+src/.ipynb_checkpoints/Untitled3-checkpoint.ipynb
+src/.ipynb_checkpoints/Untitled4-checkpoint.ipynb
+src/trt_engines/trtez_416
