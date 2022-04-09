@@ -4,7 +4,7 @@ import r200 as r200
 import rospy
 import numpy as np
 import cv2
-from time import sleep
+from time import sleep, time
 import math
 import detection as dect
 import plane_fitting as plane
@@ -63,6 +63,7 @@ def tracker_yolo(camera, tiny = False):
     # sleep(10)
     print('getting started')
     while True:
+        t0 = time()
         total_count +=1
         bgr = camera.img_bgr_left[...,::-1]
         depth = camera.img_depth
@@ -127,12 +128,15 @@ def tracker_yolo(camera, tiny = False):
             
 
             cv2.imshow('YOLO output', yolo_out)
-            rate.sleep()
+            # rate.sleep()
             
         else:
             cv2.imshow('YOLO output', bgr)
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
+        t1 = time()
+
+        print(str(1/(t1 - t0)) + ' fps output')
     cv2.destroyAllWindows()
         
 
