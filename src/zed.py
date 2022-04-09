@@ -60,14 +60,14 @@ class ZED_output:
         #np.save('zed_data/d'+str(self.count_depth), self.img_depth)
         #self.count_depth += 1
         #self.img_depth = ros_numpy.numpify(depth_data)
-        print('frame grab '+str(1/(t0 - self.t0)))
+        # print('frame grab '+str(1/(t0 - self.t0)))
         self.t0 = t0
 
 
     def get_rgb_left(self, rgb_data):
         self.img_rgb_left = np.frombuffer(rgb_data.data, dtype=np.uint8).reshape(rgb_data.height, rgb_data.width, -1)[:,:,0:3]
         self.img_bgr_left = self.img_rgb_left[...,::-1]
-
+        # print('hmm')
         #cv2.imwrite('zed_data/zl'+str(self.count_bgr_l)+ '.jpeg', self.img_bgr_left)
         #self.count_bgr_l += 1
         
@@ -89,6 +89,8 @@ if __name__ == '__main__':
             camera = ZED_output()
     except rospy.ROSInterruptException:
             pass
-    sleep(10)
+    sleep(120)
+    
+
     #np.save('depth.npy', np.array(camera.img_depth))
     

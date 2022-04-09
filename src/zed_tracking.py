@@ -51,8 +51,8 @@ def tracker_yolo(camera, tiny = True):
     board = yolo.yolo(tiny= tiny)
     
     
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
+    # fig = plt.figure()
+    # ax = fig.add_subplot(projection='3d')
     rate = rospy.Rate(20)
     xyz = [0,0,0]
     angle = 0
@@ -60,9 +60,11 @@ def tracker_yolo(camera, tiny = True):
     error_count = 1
     total_count = 0
     print('CV loaded to be used')
+    # sleep(10)
+    print('getting started')
     while True:
         total_count +=1
-        bgr = camera.img_bgr[...,::-1]
+        bgr = camera.img_bgr_left[...,::-1]
         depth = camera.img_depth
         Fx = camera.Px
         Fy = camera.Py
@@ -88,18 +90,36 @@ def tracker_yolo(camera, tiny = True):
             x_center = (center[0] - bgr.shape[1]/2)*avg_z/Fx
             y_center = (center[1] - bgr.shape[0]/2)*avg_z/Fy
             xyz = [x_center, y_center, avg_z]
+            # try:
+            #     sense = line.best_line(pc_sense)
+            #     sense = -1*sense[1]/sense[0]
+            #     m = plane.face_vector(pc)
+            #     a ,b, c, d = m
+            #     angle = trans.angle_with_z([a, b ,c])
+            #     #print(angle)
+            #     #print(sense)
+            #     TO.pub(1, xyz, angle, sense)
+            # except:
+            #     print('Error in plane finding '+ str(round(error_count/total_count, 3)) + ' kx: ' + str(kx) + ' ky: ' + str(ky))
+            #     error_count += 1
+            #     TO.pub(0, xyz, angle, sense)
             try:
-                sense = line.best_line(pc_sense)
-                sense = -1*sense[1]/sense[0]
-                m = plane.face_vector(pc)
-                a ,b, c, d = m
-                angle = trans.angle_with_z([a, b ,c])
+                sense, best_fit_found = line.best_line(pc_sense)
+                if best_fit_found:
+                    sense = -1*sense[1]/sense[0]
+                else:
+                    sense = sense0
+
+                m, best_fit_found = plane.face_vector(pc)
+                if best_fit_found:
+                    a ,b, c, d = m
+                    angle = trans.angle_with_z([a, b ,c])
                 #print(angle)
                 #print(sense)
+                sense0 = sense
                 TO.pub(1, xyz, angle, sense)
             except:
-                print('Error in plane finding '+ str(round(error_count/total_count, 3)) + ' kx: ' + str(kx) + ' ky: ' + str(ky))
-                error_count += 1
+                print('Error in plane finding')
                 TO.pub(0, xyz, angle, sense)
             
             #print(xyz)
