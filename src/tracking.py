@@ -140,9 +140,6 @@ def tracker_yolo(camera):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Image count')
-    parser.add_argument('algo', type=str, default='yolo',  help='Tracking algorithm')
-    args = parser.parse_args()
     try:
             camera = r200.R200_output()
     except rospy.ROSInterruptException:
@@ -152,7 +149,4 @@ if __name__ == '__main__':
     camera.click_rgb_image()
     camera.depth_camera_info
     sleep(10)
-    if args.algo == 'yolo':
-        tracker_yolo(camera)
-    else:
-        pass
+    tracker_yolo(camera)
