@@ -8,10 +8,13 @@ project(mlcv)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+	pcl_conversions
+	pcl_ros
 	roscpp
 	rospy
 	std_msgs
 	message_generation
+	sensor_msgs
 	)
 
 ## System dependencies are found with CMake's conventions
@@ -54,11 +57,10 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  plane.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -70,6 +72,7 @@ add_message_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
+  sensor_msgs
   std_msgs  # Or other packages containing msgs
  )
 
@@ -118,7 +121,7 @@ CATKIN_DEPENDS message_runtime
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-# ${catkin_INCLUDE_DIRS}
+${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -205,3 +208,7 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(plane_srv src/plane_srv.cpp)
+target_link_libraries(plane_srv ${catkin_LIBRARIES}
+        ${PCL_LIBRARIES})
