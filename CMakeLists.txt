@@ -212,3 +212,7 @@ ${catkin_INCLUDE_DIRS}
 add_executable(plane_srv src/plane_srv.cpp)
 target_link_libraries(plane_srv ${catkin_LIBRARIES}
         ${PCL_LIBRARIES})
+
+add_executable(plane_srv_full src/plane_srv_full.cpp)
+target_link_libraries(plane_srv_full ${catkin_LIBRARIES}
+        ${PCL_LIBRARIES})
