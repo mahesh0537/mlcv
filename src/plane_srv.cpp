@@ -10,6 +10,7 @@
 #include <std_msgs/Float64.h>
 #include <ros/ros.h>
 #include <pcl/PCLPointCloud2.h>
+#include <pcl/common/centroid.h>
 #include "pcl/point_cloud.h"
 
 #include "mlcv/plane.h"
@@ -78,11 +79,16 @@ bool plane_seg_callback(mlcv::plane::Request &req,
 
     if (find_plane){
         pcl::ModelCoefficients::Ptr coefficients = plane(organizedCloud);
+        pcl::PointXYZ c1;
+        pcl::computeCentroid(*organizedCloud, c1);
         res.if_found = true;
         res.a = (double)coefficients->values[0];
         res.b = (double)coefficients->values[1];
         res.c = (double)coefficients->values[2];
         res.d = (double)coefficients->values[3];
+        res.x = (double)c1.x;
+        res.y = (double)c1.y;
+        res.z = (double)c1.z;
         if (debug){
 
             std::cerr << "Model coefficients: " << coefficients->values[0] << " " 
