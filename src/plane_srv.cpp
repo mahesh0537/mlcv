@@ -12,6 +12,7 @@
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/common/centroid.h>
 #include "pcl/point_cloud.h"
+#include <pcl/filters/filter.h>
 
 #include "mlcv/plane.h"
 
@@ -77,18 +78,24 @@ bool plane_seg_callback(mlcv::plane::Request &req,
         }
     }
 
+    pcl::PointCloud<pcl::PointXYZ>::Ptr organizedCloud_noNaN(new pcl::PointCloud< pcl::PointXYZ>);
+    organizedCloud_noNaN->is_dense = false;
+    std::vector<int> ind;
+    pcl::removeNaNFromPointCloud(*organizedCloud, *organizedCloud_noNaN, ind);
+
     if (find_plane){
-        pcl::ModelCoefficients::Ptr coefficients = plane(organizedCloud);
-        pcl::PointXYZ c1;
-        pcl::computeCentroid(*organizedCloud, c1);
-        res.if_found = true;
-        res.a = (double)coefficients->values[0];
-        res.b = (double)coefficients->values[1];
-        res.c = (double)coefficients->values[2];
-        res.d = (double)coefficients->values[3];
-        res.x = (double)c1.x;
-        res.y = (double)c1.y;
-        res.z = (double)c1.z;
+        if(organizedCloud_noNaN->size() > 0){
+            pcl::ModelCoefficients::Ptr coefficients = plane(organizedCloud_noNaN);
+            pcl::PointXYZ c1;
+            pcl::computeCentroid(*organizedCloud_noNaN, c1);
+            res.if_found = true;
+            res.a = (double)coefficients->values[0];
+            res.b = (double)coefficients->values[1];
+            res.c = (double)coefficients->values[2];
+            res.d = (double)coefficients->values[3];
+            res.x = (double)c1.x;
+            res.y = (double)c1.y;
+            res.z = (double)c1.z;
         if (debug){
 
             std::cerr << "Model coefficients: " << coefficients->values[0] << " " 
@@ -98,14 +105,14 @@ bool plane_seg_callback(mlcv::plane::Request &req,
 
             std::cout<<"No of nan points : "<<n_nan;
             ROS_INFO(" ");
-        }
+        }}
     }
 
     if (debug){
-        organizedCloud->header.frame_id = "/map";
-        pcl_conversions::toPCL(ros::Time::now(), organizedCloud->header.stamp);
+        organizedCloud_noNaN->header.frame_id = "/map";
+        pcl_conversions::toPCL(ros::Time::now(), organizedCloud_noNaN->header.stamp);
         sm::PointCloud2 cloudMessage;
-        pcl::toROSMsg(*organizedCloud,cloudMessage);
+        pcl::toROSMsg(*organizedCloud_noNaN,cloudMessage);
         pc_pub.publish(cloudMessage);
     }
     return true;
