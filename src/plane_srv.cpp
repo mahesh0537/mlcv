@@ -104,7 +104,7 @@ cloud->points.resize (cloud->height * cloud->width);
   pointcloud_type::iterator pt_iter = cloud->begin ();
 //   std::cout<<(int)cloud->height<<std::endl;
 //   std::cout<<(int)cloud->width;
-  ROS_INFO(" lol");
+  // ROS_INFO(" lol");
   for (int v = 0; v < (int)cloud->height; ++v)
   {
       depth_idx = ((int)req.width)*((int)y1 + v) + (int)x1;
