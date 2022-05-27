@@ -136,7 +136,7 @@ cloud->points.resize (cloud->height * cloud->width);
     pcl::removeNaNFromPointCloud(*cloud, *organizedCloud_noNaN, ind);
 
     if (find_plane){
-        if(organizedCloud_noNaN->size() > 0){
+        if(organizedCloud_noNaN->size() > 10){
             pcl::ModelCoefficients::Ptr coefficients = plane(organizedCloud_noNaN);
             pcl::PointXYZ c1;
             pcl::computeCentroid(*organizedCloud_noNaN, c1);
