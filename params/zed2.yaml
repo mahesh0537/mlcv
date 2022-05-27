@@ -6,10 +6,10 @@ pub_frame_rate:             30
 general:
     camera_model:               'zed2'
     resolution:                 1
-    grab_frame_rate:            30
+    grab_frame_rate:            15
 
 depth:
-    min_depth:                  0.3             # Min: 0.2, Max: 3.0 - Default 0.7 - Note: reducing this value wil require more computational power and GPU memory
+    min_depth:                  0.05             # Min: 0.2, Max: 3.0 - Default 0.7 - Note: reducing this value wil require more computational power and GPU memory
     max_depth:                  20.0            # Max: 40.0
     quality:                    3
     
@@ -21,7 +21,7 @@ pos_tracking:
 
 sensors:
     sensors_timestamp_sync:     false           # Synchronize Sensors messages timestamp with latest received frame
-    publish_imu_tf:             true            # publish `IMU -> <cam_name>_left_camera_frame` TF
+    publish_imu_tf:             false            # publish `IMU -> <cam_name>_left_camera_frame` TF
 
 object_detection:
     od_enabled:                 false           # True to enable Object Detection [not available for ZED]
