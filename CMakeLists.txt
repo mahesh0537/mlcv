@@ -7,15 +7,33 @@ project(mlcv)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_PREFIX_PATH})
+set(TensorRT_DIR /home/mahesh/nvidia/TensorRT-8.4.1.5.Linux.x86_64-gnu.cuda-11.6.cudnn8.4/TensorRT-8.4.1.5)
+set(CUDA_TOOLKIT_ROOT_DIR /usr/local/cuda-11.5)
+
+message(STATUS "Here we go")
+message(STATUS "${CMAKE_PREFIX_PATH}" "Cmake module path")
 find_package(catkin REQUIRED COMPONENTS
 	pcl_conversions
 	pcl_ros
 	roscpp
 	rospy
 	std_msgs
+  cv_bridge
 	message_generation
 	sensor_msgs
+  image_transport
 	)
+find_package(OpenCV REQUIRED)
+find_package(TensorRT REQUIRED)
+find_package(CUDA REQUIRED)
+
+# Use the correct version of CUDA
+
+
+# set(OpenCV_DIR /usr/local/include/opencv4/opencv2)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -110,18 +128,26 @@ catkin_package(
 #  LIBRARIES mlcv
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
+INCLUDE_DIRS
 CATKIN_DEPENDS message_runtime
+               roscpp
+               sensor_msgs
+               std_msgs
+               cv_bridge
+               image_transport
 )
 
 ###########
 ## Build ##
 ###########
+# set(OpenCV_INCLUDE_DIRS "/usr/include/opencv;/usr/include")
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
 # include
 ${catkin_INCLUDE_DIRS}
+${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -199,7 +225,7 @@ ${catkin_INCLUDE_DIRS}
 #############
 ## Testing ##
 #############
-
+# message(STATUS ${OpenCV_INCLUDE_DIRS})
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_mlcv.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
@@ -220,3 +246,25 @@ target_link_libraries(plane_srv_full ${catkin_LIBRARIES}
 add_executable(try src/try.cpp)
 target_link_libraries(try ${catkin_LIBRARIES}
         ${PCL_LIBRARIES})
+
+# add_library(camera_api SHARED src/camera.cpp)
+# target_include_directories(camera_api PUBLIC ${OpenCV_INCLUDE_DIRS})
+# target_link_libraries(camera_api PUBLIC ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(camera src/camera.cpp)
+target_include_directories(camera PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(camera ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+
+# add_executable()
+
+
+add_library(tensorrt_cpp_api SHARED
+        src/engine.cpp)
+
+target_include_directories(tensorrt_cpp_api PUBLIC ${OpenCV_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS} ${TensorRT_INCLUDE_DIRS}
+        ${TensorRT_DIR}/samples/common)
+target_link_libraries(tensorrt_cpp_api PUBLIC ${OpenCV_LIBS} ${CUDA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${TensorRT_LIBRARIES})
+
+add_executable(driver src/main.cpp)
+target_link_libraries(driver tensorrt_cpp_api)
